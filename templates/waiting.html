@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <title>Waiting Room</title>
+
+    <script>
+
+        let hostname = "tongs-macbook-pro.local";
+        let socket = io.connect("http://" + hostname + ":5000");
+        
+        function game_start(){
+            // let to_hide = document.querySelectorAll(".to_hide");
+            // for(let index = 0; index<to_hide.length;++index){
+            //     to_hide[index].style.display = "none"
+            // }
+            socket.emit("game_start");
+        }
+
+        socket.on('on_connect', function(msg){
+            document.querySelector("#client_id").innerHTML = msg.client_id
+        });
+
+        socket.on('game_status', function(msg){
+            document.querySelector("#number_of_players").innerHTML = msg.number_of_players;
+        });
+
+        socket.on("disconnect", function(msg){
+            document.querySelector("#number_of_players").innerHTML = msg.number_of_players;
+        });
+
+    </script>
+
+    <style>
+        /* CSS Here */
+    </style>
+</head>
+<body>
+
+    <h1> My player id is <span id = "client_id"></span> </h1>
+    <h2 class = "to_hide"> There are currently <span id = "number_of_players"></span> players in the game </h2>
+
+
+    <h1 class = "to_hide"> {{message}} </h1>
+    {% if "create" in message: %}
+        <button class = "to_hide" id = "start_game_button" onclick = game_start() > Start Game</button>
+    {% endif %}
+
+
+</body>
+</html>
