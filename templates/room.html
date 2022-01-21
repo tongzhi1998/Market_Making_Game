@@ -6,11 +6,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href= "{{ url_for('static',filename='room.css') }}">
 
-    <title>Game Room</title>
+    <title>Waiting Room</title>
+
+    <script>
+        let hostname = "tongs-macbook-pro.local";
+        let socket = io.connect("http://" + hostname + ":5000");
+        
+        function game_start(){
+            let number_of_players = document.querySelector("#number_of_players").innerHTML;
+            socket.emit("game_start", {"number_of_players": number_of_players});
+        }
+
+        socket.on('on_connect', function(msg){
+            let current_id = document.querySelector("#client_id").innerHTML;
+            if(current_id==null || current_id==""){
+                document.querySelector("#client_id").innerHTML = msg.client_id;
+            }
+        });
+
+        socket.on('game_status', function(msg){
+            document.querySelector("#number_of_players").innerHTML = msg.number_of_players;
+        });
+
+        socket.on("disconnect", function(msg){
+            document.querySelector("#number_of_players").innerHTML = msg.number_of_players;
+        });
+
+        socket.on("game_start", function(msg){
+            let to_hide = document.querySelectorAll(".to_hide");
+            for(let index = 0; index<to_hide.length;++index){
+                to_hide[index].style.display = "none"
+            }
+        });
+
+    </script>
 </head>
+
 <body>
-    
+    <h1> My player id is <span id = "client_id"></span> </h1>
+    <h2 class = "to_hide"> There are currently <span id = "number_of_players"></span> players in the game </h2>
+    <h1 class = "to_hide"> {{message}} </h1>
+    {% if "create" in message: %}
+        <button class = "to_hide" id = "start_game_button" onclick = game_start() > Start Game</button>
+    {% endif %}
+
+    <article class = "over_under">
+        <h1>Over Under Bet</h1>
+        <hr>
+        <h2 id = "over_under_ask"> Ask </h2>
+        <section class="over_under_header">
+            <table width="30%">
+                <tr>
+                    <th class="price" width="15%">Price</th>
+                    <th width="15%">Volume</th>
+                </tr>
+            </table>
+        </section>
+        <section class="side" id="asks">
+            <table width="30%">
+                <tr>
+                    <td width="15%" class="price sell priceclick">1000000.00000</td>
+                    <td width="15%">0.00000100</td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="divider">
+            <div class="current-price">Currently Trading at 715.00000</div>
+        </section>
+
+        <h2 id = "over_under_bid"> Bid </h2>
+        <section class="side bids">
+            <table width="30%">
+                <tr>
+                    <td width="15%" class="price buy priceclick">710.00000</td>
+                    <td width="15%">0.00140845</td>
+                </tr>
+            </table>
+        </section>
+    </article>
+
+
+    <script>
+        const asks = document.getElementById("asks")
+        asks.scrollTo(0, asks.offsetHeight)
+    </script>
 </body>
 </html>
