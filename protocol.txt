@@ -1,0 +1,69 @@
+Server Side
+
+1. Client Establish Connection |  @socketio.on('connect')
+Reply: 
+1)on_connect => Direct
+{
+    "client_id": int 
+}
+
+2)game_status => Broadcast
+{
+    "number_of_players": int
+}
+
+2. Receive "game_start" from host
+Reply:
+1)game_start => boardcast
+{
+
+}
+
+3. Receive "order" from host
+Reply:
+update
+{
+    type: type
+    trading_price: trading_price
+    orderbook_bid: orderbook_bid_list
+    orderbook_ask: orderbook_ask_list
+    transaction: incremental
+}
+
+
+
+------------------------------------------------------------------------------------------
+Client Side
+
+1. Received "on_connect" from server
+Reply: None
+{
+
+}
+Update client id in html
+
+2. Receive "game_status" from server
+Reply: None
+{
+
+}
+Update "number of players" in html
+
+3. Host click on "Start" button
+Send
+game_start
+{
+    "number_of_players": int
+}
+
+4. Client input order price and amount
+Send
+order
+{
+    "player_id": int
+    "type": int (1 is over_under, 2 is future, 3 is options)
+    "side": int (1 is buy and 2 is sell)
+    "price": int
+    "amount": int
+}
+

@@ -20,8 +20,9 @@ class OrderBook:
         self.current_price = 0.0
         self.transactions = []
         
-    def match_order(self, order: Order) -> tuple(int, list[tuple(float, int)], list[tuple(float, int)]):
-        if order.side == 1: # Buying Order
+    def match_order(self, order: Order) -> tuple[int, list[tuple[float, int]], list[tuple[float, int]]]:
+        print(order.side)
+        if order.side == 'buy': # Buying Order
             while order.quantity > 0 and len(self.heap_ask) > 0:
                 to_match = heapq.heappop(self.heap_ask)
                 if to_match.price > order.price:
@@ -62,11 +63,11 @@ class OrderBook:
         
         self.__add_order_to_book(order)
 
-        return self.current_price, self.__get_order_list(1), self.__get_order_list(2)
+        return self.current_price, self.__get_order_list("buy"), self.__get_order_list("sell")
 
-    def __get_order_list(self, type: int) -> list[tuple(int, float)]:
+    def __get_order_list(self, side: str) -> list[tuple[int, float]]:
         ans = []
-        if type == 1: # Bid Side
+        if side == "buy": # Bid Side
             for key, value in self.map_bid.items():
                 ans.append((key, value))
             ans.sort(reverse = True)
@@ -79,12 +80,18 @@ class OrderBook:
     def __add_order_to_book(self, order: Order) -> None:
         if order.quantity == 0:
             return
-        if order.side == 1: # Buying Order
+        if order.side == "buy": # Buying Order
             heapq.heappush(self.heap_bid,order)
-            self.map_bid[order.price] += order.quantity
+            if order.price in self.map_bid:
+                self.map_bid[order.price] += order.quantity
+            else:
+                self.map_bid[order.price] = order.quantity
         else: # Buying Order
             heapq.heappush(self.heap_ask,order)
-            self.map_ask[order.price] += order.quantity
+            if order.price in self.map_ask: 
+                self.map_ask[order.price] += order.quantity
+            else:
+                self.map_ask[order.price] = order.quantity
 
 
 

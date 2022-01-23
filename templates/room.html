@@ -8,7 +8,7 @@
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href= "{{ url_for('static',filename='room.css') }}">
 
-    <title>Waiting Room</title>
+    <title>Game Room</title>
 
     <script>
         let hostname = "tongs-macbook-pro.local";
@@ -39,6 +39,10 @@
             for(let index = 0; index<to_hide.length;++index){
                 to_hide[index].style.display = "none"
             }
+        });
+
+        socket.on("update", function(msg){
+            console.log(msg);
         });
 
     </script>
@@ -86,12 +90,53 @@
                 </tr>
             </table>
         </section>
+
+        <section id = "over_under_submit_order">
+            <form id = "submit_form">
+                <input type = "text" style = "display: none;" value = "over_under" name = "type">
+                <input type="radio" id="buy" name="side" value="buy"> Buy
+                <input type="radio" id="sell" name="side" value="sell"> Sell
+                <br>
+                <input id = "price"> Price
+                <br>
+                <input id = "quantity"> Quantity
+                <br>
+                <button type = "submit"> Submit Order </button>
+            </form>
+        </section>
+
     </article>
 
 
     <script>
-        const asks = document.getElementById("asks")
-        asks.scrollTo(0, asks.offsetHeight)
+        const asks = document.getElementById("asks");
+        asks.scrollTo(0, asks.offsetHeight);
+
+        const form = document.querySelector('form'); // I think we need an array here
+        
+        form.addEventListener('submit', event => {;
+            // submit event detected
+            event.preventDefault();
+            let type = "over_under"; // Hard coded for now
+            let side = "buy";
+            if (document.querySelector("#sell").checked){
+                side = "sell";
+            }
+            let price = document.querySelector("#price").value;
+            let quantity = document.querySelector("#quantity").value
+            let player_id = document.querySelector("#client_id").innerHTML;
+
+            socket.emit("order", {
+                "player_id": player_id,
+                "type": type,
+                "side": side,
+                "price": price,
+                "quantity": quantity
+            });
+
+
+        })
+        
     </script>
 </body>
 </html>

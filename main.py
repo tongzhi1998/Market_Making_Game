@@ -3,11 +3,13 @@
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
 
+from datetime import datetime
 from flask import render_template, flash, Flask, redirect, request, url_for
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 
 from game import Game
+from order import Order
 
 
 app = Flask(__name__)
@@ -60,7 +62,8 @@ def connect():
 
 @socketio.on('game_start')
 def game_start(msg):
-    players_id = [i for i in range(1,msg.number_of_players+1)] # TODO: figure out the exact player ids!
+    print(msg)
+    players_id = [i for i in range(1,int(msg["number_of_players"])+1)] # TODO: figure out the exact player ids!
     game = Game(players_id)
     socketio.emit("game_start", {})
     
@@ -70,6 +73,35 @@ def disconnect():
     global number_of_players
     number_of_players -= 1
     emit("game_status", {"number_of_players": number_of_players}, broadcast = True)
+
+@socketio.on("order")
+def process_order(msg):
+    player_id = int(msg["player_id"])
+    type = msg["type"]
+    side = msg["side"]
+    price = float(msg["price"])
+    quantity = int(msg["quantity"])
+
+    order = Order(player_id, type, side, price, quantity, datetime.utcnow())
+
+    if type == "over_under":
+        orderbook = game.over_under_book
+        trading_price, bids, asks = orderbook.match_order(order)
+        print("trading price", trading_price)
+        print("bid list", bids)
+        print("ask list", asks)
+        emit("update", {
+            "type": type,
+            "trading_price": trading_price,
+            "bids": bids,
+            "asks": asks,
+            "transaction":[] # TODO: Need modification here
+        }, broadcast = True)
+
+
+        
+
+    print(player_id, type, side, price, quantity)
 
 
 if __name__ == '__main__':
