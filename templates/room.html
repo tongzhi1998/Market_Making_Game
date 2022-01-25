@@ -46,75 +46,157 @@
         });
 
     </script>
+
+    <style>
+        #time{
+            text-align: center;
+        }
+        #upper_right{
+            margin-top: -10px;
+            float: right;
+        }
+        #header_line{
+            clear: both;
+        }
+
+        .container {
+            display: flex;                  /* establish flex container */
+            flex-direction: row;            /* default value; can be omitted */
+            flex-wrap: nowrap;              /* default value; can be omitted */
+            justify-content: space-between; /* switched from default (flex-start, see below) */
+            width: 100%;
+            height: 500px;
+        }
+        .container > div {
+            width: 33.3%;
+            height: 100%;
+            border-left: 2px dashed red;
+        }
+
+        .orderbook_title{
+            text-align: center;
+        }
+
+        table{
+           width: 100%;
+           margin-bottom: 5%;
+           text-align: center;
+        }
+
+        td{
+            width: 50%;
+        }
+
+        .ask_table td{
+           color:red;
+        }
+
+        .bid_table td{
+            color: green;
+        }
+
+        #book_transaction_separation{
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+
+
+    </style>
 </head>
 
 <body>
-    <h1> My player id is <span id = "client_id"></span> </h1>
-    <h2 class = "to_hide"> There are currently <span id = "number_of_players"></span> players in the game </h2>
-    <h1 class = "to_hide"> {{message}} </h1>
-    {% if "create" in message: %}
-        <button class = "to_hide" id = "start_game_button" onclick = game_start() > Start Game</button>
-    {% endif %}
+    <div id = "upper_right">
+        <p id = "player_id"> Player ID: <span id = "client_id"></span> </p>
+        <a id = "end_game" href = ""> End Game</a>
+    </div>
+    <h1 id = "time"> Time Remaining: XXXXX </h1>
+    <hr id = "header_line">
 
-    <article class = "over_under">
-        <h1>Over Under Bet</h1>
-        <hr>
-        <h2 id = "over_under_ask"> Ask </h2>
-        <section class="over_under_header">
-            <table width="30%">
+    <div class = "to_hide">
+        <h2> There are currently <span id = "number_of_players"></span> players in the game </h2>
+        <h2 > {{message}} </h2>
+        {% if "create" in message: %}
+            <button class = "to_hide" id = "start_game_button" onclick = game_start() > Start Game</button>
+        {% endif %}
+    </div>
+
+    <div class = "container">
+        <div class = "orderbook" id = "over_under">
+            <h2 class = "orderbook_title" id = "over_under_title"> Over Under Book </h2>
+
+            <table class = "ask_table" id = "over_under_ask_table">
                 <tr>
-                    <th class="price" width="15%">Price</th>
-                    <th width="15%">Volume</th>
+                    <th class = "price" id = "over_under_price">Price</th>
+                    <th class = "volume" id = "over_under_volume">Volume</th>
+                </tr>
+                <tr class = "ask5" id = "over_under_ask5">
+                    <td> 100 </td>
+                    <td> 10000 </td>
+                </tr>
+                <tr class = "ask4" id = "over_under_ask4">
+                    <td> 99 </td>
+                    <td> 1000 </td>
+                </tr>
+                <tr class = "ask3" id = "over_under_ask3">
+                    <td> 98 </td>
+                    <td> 1050 </td>
+                </tr>
+                <tr class = "ask2" id = "over_under_ask2">
+                    <td> 97 </td>
+                    <td> 1050 </td>
+                </tr>
+                <tr class = "ask1" id = "over_under_ask1">
+                    <td> 96 </td>
+                    <td> 1050 </td>
                 </tr>
             </table>
-        </section>
-        <section class="side" id="asks">
-            <table width="30%">
-                <tr>
-                    <td width="15%" class="price sell priceclick">1000000.00000</td>
-                    <td width="15%">0.00000100</td>
+
+            <!-- <section class = "trading_price" id = "over_under_trading_price">
+                <p> Trading at: XXXXX</p>
+            </section> -->
+
+            <table class = "bid_table" id = "over_under_bid_table">
+                <tr class = "bid1" id = "over_under_bid1">
+                    <td> 95 </td>
+                    <td> 10000 </td>
+                </tr>
+                <tr class = "bid2" id = "over_under_bid2">
+                    <td> 94 </td>
+                    <td> 1000 </td>
+                </tr>
+                <tr class = "bid3" id = "over_under_bid3">
+                    <td> 93 </td>
+                    <td> 1050 </td>
+                </tr>
+                <tr class = "bid4" id = "over_under_bid4">
+                    <td> 92 </td>
+                    <td> 1050 </td>
+                </tr>
+                <tr class = "bid5" id = "over_under_bid5">
+                    <td> 91 </td>
+                    <td> 1050 </td>
                 </tr>
             </table>
-        </section>
 
-        <section class="divider">
-            <div class="current-price">Currently Trading at 715.00000</div>
-        </section>
+            <hr id = "book_transaction_separation">
 
-        <h2 id = "over_under_bid"> Bid </h2>
-        <section class="side bids">
-            <table width="30%">
-                <tr>
-                    <td width="15%" class="price buy priceclick">710.00000</td>
-                    <td width="15%">0.00140845</td>
-                </tr>
-            </table>
-        </section>
+            
+        </div>
 
-        <section id = "over_under_submit_order">
-            <form id = "submit_form">
-                <input type = "text" style = "display: none;" value = "over_under" name = "type">
-                <input type="radio" id="buy" name="side" value="buy"> Buy
-                <input type="radio" id="sell" name="side" value="sell"> Sell
-                <br>
-                <input id = "price"> Price
-                <br>
-                <input id = "quantity"> Quantity
-                <br>
-                <button type = "submit"> Submit Order </button>
-            </form>
-        </section>
+        <div class = "orderbook" id = "future">
+            <h2 class = "orderbook_title" id = "future_title"> Future Book </h2>
+        </div>
 
-    </article>
+        <div class = "orderbook" id = "option">
+            <h2 class = "orderbook_title" id = "option_title"> Option Book </h2>
+        </div>
+    </div>
 
 
     <script>
-        const asks = document.getElementById("asks");
-        asks.scrollTo(0, asks.offsetHeight);
 
-        const form = document.querySelector('form'); // I think we need an array here
-        
-        form.addEventListener('submit', event => {;
+        const form = document.querySelector('form'); // I think we need an array here       
+        form.addEventListener('submit', event => {
             // submit event detected
             event.preventDefault();
             let type = "over_under"; // Hard coded for now
@@ -133,9 +215,7 @@
                 "price": price,
                 "quantity": quantity
             });
-
-
-        })
+        });
         
     </script>
 </body>
