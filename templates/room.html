@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js" integrity="sha384-fKnu0iswBIqkjxrhQCTZ7qlLHOFEgNkRmK2vaO/LbTZSXdJfAu6ewRBdwHPhBo/H" crossorigin="anonymous"></script>
-    <link rel="stylesheet" type="text/css" href= "{{ url_for('static',filename='room.css') }}">
+    <!-- <link rel="stylesheet" type="text/css" href= "{{ url_for('static',filename='room.css') }}"> -->
 
     <title>Game Room</title>
 
@@ -48,6 +48,14 @@
     </script>
 
     <style>
+        body{
+            height: 100%;
+        }
+
+        .centered{
+            text-align: center;
+        }
+
         #time{
             text-align: center;
         }
@@ -59,39 +67,37 @@
             clear: both;
         }
 
-        .container {
+        .orderbook_container {
             display: flex;                  /* establish flex container */
             flex-direction: row;            /* default value; can be omitted */
             flex-wrap: nowrap;              /* default value; can be omitted */
             justify-content: space-between; /* switched from default (flex-start, see below) */
             width: 100%;
-            height: 500px;
+            height: 550px;
         }
-        .container > div {
+        .orderbook_container > div {
             width: 33.3%;
             height: 100%;
             border-left: 2px dashed red;
         }
 
-        .orderbook_title{
+        .orderbook_title, .transaction_title{
             text-align: center;
         }
 
-        table{
+        .ask_table, .bid_table {
            width: 100%;
            margin-bottom: 5%;
            text-align: center;
         }
 
-        td{
-            width: 50%;
-        }
-
         .ask_table td{
-           color:red;
+            width: 50%;
+            color:red;
         }
 
         .bid_table td{
+            width: 50%;
             color: green;
         }
 
@@ -99,6 +105,74 @@
             margin-left: 5%;
             margin-right: 5%;
         }
+
+        .sub_container{
+            overflow: hidden;
+            overflow-y:scroll;
+        }
+
+        .container20{
+            height: 20%;
+        }
+
+        .container_full{
+            height:100%;
+        }
+
+        .transaction_table{
+            width: 100%;
+            text-align: center;
+        }
+
+        .transaction_table td{
+            width: 25%;
+        }
+
+        .pending_orders_table{
+            width: 100%;
+        }
+
+        td .pending_orders_table{
+            width:20%;
+        }
+
+        .positions_table{
+            width: 100%;
+        }
+
+        td .positions_table{
+            width:20%;
+        }
+
+
+        .info_container{
+            display: flex;                  /* establish flex container */
+            flex-direction: row;            /* default value; can be omitted */
+            flex-wrap: nowrap;              /* default value; can be omitted */
+            justify-content: space-between; /* switched from default (flex-start, see below) */
+            width: 100%;
+            height: 300px;
+        }
+
+        .info_container > div {
+            width: 33.33%;
+            height: 100%;
+            border-left: 2px dashed green;
+        }
+
+        #submit_form {
+            margin-left: 10px;
+        }
+
+        #available_balance{
+            margin-left: 10px;
+        }
+
+        /* #submit_order{
+            padding-left: 10px;
+        } */
+
+
 
 
     </style>
@@ -120,8 +194,8 @@
         {% endif %}
     </div>
 
-    <div class = "container">
-        <div class = "orderbook" id = "over_under">
+    <div class = "orderbook_container">
+        <div class = "orderbook" id = "over_under_book">
             <h2 class = "orderbook_title" id = "over_under_title"> Over Under Book </h2>
 
             <table class = "ask_table" id = "over_under_ask_table">
@@ -179,8 +253,48 @@
             </table>
 
             <hr id = "book_transaction_separation">
+            <h2 class = "transaction_title">Transaction History</h2>
+            <div class = "sub_container container20" id = "transaction_container">
+                <table class = "transaction_table" id = "over_under_transaction_table">
+                    <tr>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Side</th>
+                        <th>Time</th>
+                    </tr>
+                    <tr>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                    </tr>
+                    <tr>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                    </tr>
+                    <tr>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                    </tr>
+                    <tr>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                    </tr>
+                    <tr>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                        <td>xxx</td>
+                    </tr>
+                </table>
+            </div>
 
-            
         </div>
 
         <div class = "orderbook" id = "future">
@@ -190,16 +304,85 @@
         <div class = "orderbook" id = "option">
             <h2 class = "orderbook_title" id = "option_title"> Option Book </h2>
         </div>
+    </div> 
+
+    <!-- End of OrderBook container -->
+    <hr id = "order_info_separation">
+
+    <div class = "info_container">
+        <div id = "pending_orders">
+            <h2 class = "centered" id = "pending_orders_title">Pending Orders</h2>
+            <div class = "sub_container container_full" id = "pending_orders_container">
+                <table class = "pending_orders_table">
+                    <tr>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Side</th>
+                        <th>Time</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id = "positions">
+            <h2 class = "centered" id = "positions_title">Positions</h2>
+            <div class = "sub_container container_full" id = "positions_container">
+                <table class = "positions_table">
+                    <tr>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Side</th>
+                        <th>Time</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id = "submit_order">
+            <h2 class = "centered" id = "submit_order_title"> Submit Order </h2>
+            <p id = "available_balance">Available Balance: XXXXX</p>
+            <div id = "over_under_submit_order">
+                <form id = "submit_form">
+                    <fieldset>
+                        <input type="radio" id="over_under_order" name="type" value="over_under"> Over Under
+                        <input type="radio" id="future_order" name="type" value="future"> Future
+                        <input type="radio" id="option_order" name="type" value="option"> Option
+                    </fieldset>
+                    <fieldset>
+                        <input type="radio" id="buy" name="side" value="buy"> Buy
+                        <input type="radio" id="sell" name="side" value="sell"> Sell
+                    </fieldset>
+                    
+                    <fieldset>
+                        Price: <input id = "price"> 
+                    </fieldset>
+                    <fieldset>
+                        Quantity: <input id = "quantity">
+                    </fieldset>
+                    <br>
+                    <button type = "submit"> Submit Order </button>
+                </form>
+            </div>
+        </div>
     </div>
 
 
-    <script>
 
-        const form = document.querySelector('form'); // I think we need an array here       
+
+    <script>
+        const form = document.querySelector('form');
         form.addEventListener('submit', event => {
             // submit event detected
             event.preventDefault();
-            let type = "over_under"; // Hard coded for now
+            let type = "over_under";
+            if(document.querySelector("#future_order").checked){
+                type = "future";
+            }else if(document.querySelector("#option_order").checked){
+                type = "option";
+            }
+
             let side = "buy";
             if (document.querySelector("#sell").checked){
                 side = "sell";
@@ -208,6 +391,7 @@
             let quantity = document.querySelector("#quantity").value
             let player_id = document.querySelector("#client_id").innerHTML;
 
+            // We leave the time to the backend
             socket.emit("order", {
                 "player_id": player_id,
                 "type": type,

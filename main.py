@@ -84,22 +84,23 @@ def process_order(msg):
 
     order = Order(player_id, type, side, price, quantity, datetime.utcnow())
 
-    if type == "over_under":
-        orderbook = game.over_under_book
-        trading_price, bids, asks = orderbook.match_order(order)
-        print("trading price", trading_price)
-        print("bid list", bids)
-        print("ask list", asks)
-        emit("update", {
-            "type": type,
-            "trading_price": trading_price,
-            "bids": bids,
-            "asks": asks,
-            "transaction":[] # TODO: Need modification here
-        }, broadcast = True)
+    orderbook = game.over_under_book
+    if type == "future":
+        orderbook = game.future_book
+    elif type == "option":
+        orderbook = game.option_book
+    trading_price, bids, asks = orderbook.match_order(order)
+    # print("trading price", trading_price)
+    # print("bid list", bids)
+    # print("ask list", asks)
+    emit("update", {
+        "type": type,
+        "trading_price": trading_price,
+        "bids": bids,
+        "asks": asks,
+        "transaction":[] # TODO: Need modification here
+    }, broadcast = True)
 
-
-        
 
     print(player_id, type, side, price, quantity)
 
