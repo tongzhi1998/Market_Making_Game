@@ -10,6 +10,8 @@ class Transaction:
         else:
             self.price = buy_side.price
         
+        assert buy_side.type == sell_side.type
+        self.type = buy_side.type
         self.buyer_id = buy_side.player_id
         self.seller_id = sell_side.player_id
         self.time = datetime.utcnow()

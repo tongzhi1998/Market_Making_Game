@@ -84,12 +84,15 @@ def process_order(msg):
 
     order = Order(player_id, type, side, price, quantity, datetime.utcnow())
 
+    if type == "buy":
+        game.players[player_id].buying_power -= price * quantity
+
     orderbook = game.over_under_book
     if type == "future":
         orderbook = game.future_book
     elif type == "option":
         orderbook = game.option_book
-    trading_price, bids, asks = orderbook.match_order(order)
+    trading_price, bids, asks, transactions = orderbook.match_order(order)
     # print("trading price", trading_price)
     # print("bid list", bids)
     # print("ask list", asks)
@@ -98,11 +101,12 @@ def process_order(msg):
         "trading_price": trading_price,
         "bids": bids,
         "asks": asks,
-        "transaction":[] # TODO: Need modification here
+        "transactions": transactions,
+        "players_status": [player for player in game.players]
     }, broadcast = True)
 
 
-    print(player_id, type, side, price, quantity)
+    print(player_id, type, side, price, quantity, transactions)
 
 
 if __name__ == '__main__':

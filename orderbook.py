@@ -8,6 +8,8 @@ class OrderBookType(enum.Enum):
     future = 2
     option = 3
 
+
+
 class OrderBook:
     def __init__(self, type: OrderBookType, strike_price: int = 0) -> None:
         self.type = type
@@ -20,8 +22,8 @@ class OrderBook:
         self.current_price = 0.0
         self.transactions = []
         
-    def match_order(self, order: Order) -> tuple[int, list[tuple[float, int]], list[tuple[float, int]]]:
-        print(order.side)
+    def match_order(self, order: Order) -> tuple[int, list[tuple[float, int]], list[tuple[float, int]], list[Transaction]]:
+        transactions = []
         if order.side == 'buy': # Buying Order
             while order.quantity > 0 and len(self.heap_ask) > 0:
                 to_match = heapq.heappop(self.heap_ask)
@@ -32,7 +34,7 @@ class OrderBook:
                     matched_amount = min(order.quantity, to_match.quantity)
                     transaction = Transaction(order,to_match,1)
                     self.transactions.append(transaction)
-
+                    transactions.append(transaction)
                     order.quantity -= matched_amount
                     to_match.quantity -= matched_amount
                     self.current_price = to_match.price
@@ -63,7 +65,7 @@ class OrderBook:
         
         self.__add_order_to_book(order)
 
-        return self.current_price, self.__get_order_list("buy"), self.__get_order_list("sell")
+        return self.current_price, self.__get_order_list("buy"), self.__get_order_list("sell"), transactions
 
     def __get_order_list(self, side: str) -> list[tuple[int, float]]:
         ans = []
