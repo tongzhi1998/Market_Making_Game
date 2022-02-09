@@ -2,13 +2,13 @@ from order import Order
 from transaction import Transaction
 import heapq
 import enum
+import globals
+from player import Player
 
 class OrderBookType(enum.Enum):
     over_under = 1
     future = 2
     option = 3
-
-
 
 class OrderBook:
     def __init__(self, type: OrderBookType, strike_price: int = 0) -> None:
@@ -38,6 +38,10 @@ class OrderBook:
                     order.quantity -= matched_amount
                     to_match.quantity -= matched_amount
                     self.current_price = to_match.price
+                    
+                    globals.game.players[order.player_id].complete_order(transaction,"buy")
+                    globals.game.players[to_match.player_id].complete_order(transaction,"sell")
+                    
                     if to_match.quantity != 0:
                         heapq.heappush(self.heap_ask,to_match)
                         self.map_ask[to_match.price] -= matched_amount
@@ -57,6 +61,9 @@ class OrderBook:
                     order.quantity -= matched_amount
                     to_match.quantity -= matched_amount
                     self.current_price = to_match.price
+
+                    globals.game.players[order.player_id].complete_order(transaction,"sell")
+                    globals.game.players[to_match.player_id].complete_order(transaction,"buy")
                     if to_match.quantity != 0:
                         heapq.heappush(self.heap_bid,to_match)
                         self.map_bid[to_match.price] -= matched_amount

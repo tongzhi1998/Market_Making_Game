@@ -10,6 +10,7 @@ from flask_cors import CORS
 
 from game import Game
 from order import Order
+import globals
 
 
 app = Flask(__name__)
@@ -21,7 +22,6 @@ number_of_players = 0
 hostname = "tongs-macbook-pro.local"
 active_rooms = set()
 active_games = {}
-game = Game([]) # TODO: Only 1 game for now, need 
 
 @app.route('/')
 @app.route('/index', methods = ['GET', 'POST'])
@@ -64,7 +64,7 @@ def connect():
 def game_start(msg):
     print(msg)
     players_id = [i for i in range(1,int(msg["number_of_players"])+1)] # TODO: figure out the exact player ids!
-    game = Game(players_id)
+    globals.game = Game(players_id)
     socketio.emit("game_start", {})
     
 
@@ -85,13 +85,13 @@ def process_order(msg):
     order = Order(player_id, type, side, price, quantity, datetime.utcnow())
 
     if type == "buy":
-        game.players[player_id].buying_power -= price * quantity
+        globals.game.players[player_id].buying_power -= price * quantity
 
-    orderbook = game.over_under_book
+    orderbook = globals.game.over_under_book
     if type == "future":
-        orderbook = game.future_book
+        orderbook = globals.game.future_book
     elif type == "option":
-        orderbook = game.option_book
+        orderbook = globals.game.option_book
     trading_price, bids, asks, transactions = orderbook.match_order(order)
     # print("trading price", trading_price)
     # print("bid list", bids)
@@ -102,7 +102,7 @@ def process_order(msg):
         "bids": bids,
         "asks": asks,
         "transactions": transactions,
-        "players_status": [player for player in game.players]
+        "players_status": [player for player in globals.game.players]
     }, broadcast = True)
 
 
